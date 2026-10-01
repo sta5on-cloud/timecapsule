@@ -8,6 +8,7 @@
 - **Вариант деплоя:** B (скрипт `deploy.sh`)
 - **Репозиторий:** https://github.com/sta5on-cloud/timecapsule
 - **Исходный README приложения:** [docs/app-README.md](docs/app-README.md)
+- **Отчёт ЛР3 (Amazon VPC):** [docs/lab3/README.md](docs/lab3/README.md)
 
 > Ресурсы созданы в регионе `eu-north-1` (Stockholm), а не в `eu-central-1`, как указано в задании. Экземпляр называется `stas-ec2`, группа безопасности - `stas-ec2-sg`. Публичный IP менялся после остановки и повторного запуска экземпляра: `16.170.233.36` в части 1 и `13.51.205.222` в части 2.
 
