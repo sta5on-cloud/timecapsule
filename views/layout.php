@@ -84,7 +84,7 @@ $navLink = function (string $key, string $href, string $label) use ($nav): strin
     <?php /* Shows which machine answered, which database host it uses and where files are stored. */ ?>
     Served by <code><?= e(gethostname()) ?></code> · DB: <code><?= e(config('DB_HOST', 'localhost')) ?></code> · Files: <code>S3 bucket <?= e(config('S3_BUCKET', '-')) ?></code>
     <div>Author: Stanislav</div>
-    <div>LR3</div>
+    <div>LR6</div>
   </div>
 </footer>
 
