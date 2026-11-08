@@ -42,10 +42,18 @@ if (PHP_SAPI !== 'cli') {
     });
 }
 
-// Sessions are plain files in storage/sessions/.
+// With SESSIONS_TABLE set, sessions live in DynamoDB so that any server behind the load
+// balancer can read them; without it (local Docker) they stay as files in storage/sessions/.
+// Old items are removed by the table's TTL on the "expires" attribute, not by PHP's GC.
 function start_session(): void
 {
-    session_save_path(ROOT_DIR . '/storage/sessions');
+    $table = config('SESSIONS_TABLE');
+    if ($table !== null) {
+        $client = new Aws\DynamoDb\DynamoDbClient(['region' => config('AWS_REGION', 'eu-north-1')]);
+        Aws\DynamoDb\SessionHandler::fromClient($client, ['table_name' => $table])->register();
+    } else {
+        session_save_path(ROOT_DIR . '/storage/sessions');
+    }
     session_name('timecapsule_session');
     session_set_cookie_params([
         'httponly' => true,
