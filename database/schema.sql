@@ -37,6 +37,14 @@ CREATE TABLE IF NOT EXISTS notifications (
 
 CREATE INDEX IF NOT EXISTS notifications_user_id_idx ON notifications (user_id);
 
+-- LR7: "sealed" or "opened". The unique index makes a repeated SQS message harmless:
+-- the mailer inserts with ON CONFLICT (capsule_id, kind) DO NOTHING.
+ALTER TABLE notifications ADD COLUMN IF NOT EXISTS kind VARCHAR(20);
+UPDATE notifications SET kind = CASE WHEN message LIKE '%is now open.' THEN 'opened' ELSE 'sealed' END
+ WHERE kind IS NULL;
+ALTER TABLE notifications ALTER COLUMN kind SET NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS notifications_capsule_kind_idx ON notifications (capsule_id, kind);
+
 -- Built-in "Guest" user, used when AUTH_ENABLED=false.
 -- The password hash is not a valid bcrypt hash, so nobody can log in as guest.
 INSERT INTO users (id, email, password_hash)

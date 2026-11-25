@@ -52,10 +52,15 @@ function capsules_store(): void
     $data['user_id'] = (int) $user['id'];
     $capsule = capsule_create($data);
 
-    // 3. "Send" the confirmation e-mail. This is the slow part of the request (see mailer.php).
-    $recipient = $capsule['recipient_email'] ?? $user['email'];
-    $text = sprintf('Capsule "%s" was sealed for you until %s.', $capsule['title'], format_utc($capsule['open_at']));
-    mail_send($capsule, $recipient, $text);
+    // 3. The confirmation e-mail: timecapsule-dev-mailer sends it after the capsule.sealed
+    //    event (see events.php), or the app sends it here, which is the slow part of the request.
+    if (events_enabled()) {
+        publish_event('capsule.sealed', ['capsule_id' => (int) $capsule['id'], 'user_id' => (int) $capsule['user_id']]);
+    } else {
+        $recipient = $capsule['recipient_email'] ?? $user['email'];
+        $text = sprintf('Capsule "%s" was sealed for you until %s.', $capsule['title'], format_utc($capsule['open_at']));
+        mail_send($capsule, $recipient, $text);
+    }
 
     flash('success', 'Capsule sealed.');
     redirect('/capsules/' . $capsule['id']);

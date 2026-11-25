@@ -53,8 +53,11 @@ $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
 if ($path !== '/health') {
     start_session();
 
-    // Open due capsules before any page is rendered, so pages always show the current state.
-    open_due_capsules();
+    // On AWS timecapsule-dev-opener opens capsules once a minute; locally we open them
+    // before any page is rendered, so pages always show the current state.
+    if (!events_enabled()) {
+        open_due_capsules();
+    }
 }
 
 foreach ($routes as [$routeMethod, $pattern, $handler]) {

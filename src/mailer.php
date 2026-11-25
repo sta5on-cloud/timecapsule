@@ -7,11 +7,13 @@
 // takes about MAIL_DELAY_SECONDS.
 
 // Write one notification row directly (no delay). Also used by open_due_capsules().
-function notify_insert(int $capsuleId, int $userId, string $recipient, string $message): void
+// $kind is "sealed" or "opened": at most one notification of each kind per capsule.
+function notify_insert(int $capsuleId, int $userId, string $recipient, string $message, string $kind): void
 {
     db_query(
-        'INSERT INTO notifications (capsule_id, user_id, recipient, message) VALUES (?, ?, ?, ?)',
-        [$capsuleId, $userId, $recipient, $message]
+        'INSERT INTO notifications (capsule_id, user_id, recipient, message, kind) VALUES (?, ?, ?, ?, ?)
+         ON CONFLICT (capsule_id, kind) DO NOTHING',
+        [$capsuleId, $userId, $recipient, $message, $kind]
     );
 }
 
@@ -23,5 +25,5 @@ function mail_send(array $capsule, string $recipient, string $message): void
         usleep((int) ($delaySeconds * 1_000_000)); // pretend we talk to a slow mail server
     }
 
-    notify_insert((int) $capsule['id'], (int) $capsule['user_id'], $recipient, $message);
+    notify_insert((int) $capsule['id'], (int) $capsule['user_id'], $recipient, $message, 'sealed');
 }

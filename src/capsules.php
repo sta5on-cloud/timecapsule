@@ -90,7 +90,8 @@ function open_due_capsules(): void
             (int) $capsule['id'],
             (int) $capsule['user_id'],
             $capsule['recipient_email'] ?? $capsule['email'],
-            sprintf('Your capsule "%s" is now open.', $capsule['title'])
+            sprintf('Your capsule "%s" is now open.', $capsule['title']),
+            'opened'
         );
     }
 }
